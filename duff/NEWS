@@ -1,0 +1,13 @@
+TODAY   Neat O   <neatoverse@yahoo.com>
+
+                Alternative NEWS
+
+                * In order to support the append-only model of
+                this package, each NEWS post is stored in a
+                separate file, named for the date of the post.
+                * For example, if there were NEWS for November 5,
+                1955, it would be found in one of the package
+                subdirectories (or installation subdirectories)
+                in a file named NEWS--1955-11-05.
+                * There should be a NEWS file with a date
+                matching the Date field of the DESCRIPTION file.

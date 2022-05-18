@@ -1,0 +1,177 @@
+duff
+
+Find files named by UUID
+
+Description
+
+                Find files ("ff") by UUID ("ud") provided that
+                they are stored according to a certain scheme.
+
+Keyword: file
+Keyword: Files
+Keyword: utilities
+Keyword: Utilities
+
+Usage
+
+                duff()
+                duff(path, uuid)
+
+Arguments
+
+                path
+
+                        A character vector of directory trees to
+                        search. Conceptually similar to .Library.
+
+                uuid
+
+                        A character string representing a UUID
+                        in canonical form. All of the
+                        subdirectories of the duff package have
+                        names of this form.
+
+See Also
+
+                https://en.m.wikipedia.org/wiki/Universally_
+                unique_identifier
+
+Examples
+
+                # See URN:UUID:cc197027-87e7-48d4-80b7-
+                # 6329a68f1c82#example.R
+
+Details
+
+    Definitions
+
+        target UUID
+
+                A target UUID is the name of a file that duff is
+                instructed to search for---a character string.
+                The file's name should be a representation of a
+                UUID in canonical form.  One such name is:
+
+                        c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0
+
+        tree
+
+                A tree is the pathname to a directory---a character
+                string---wherein the duff function is instructed
+                to search for a target UUID.
+
+        forest
+
+                A forest is a character vector of trees.
+
+        prefix
+
+                A prefix is the first few characters of the name
+                of a target UUID.
+
+        digraph-prefix
+
+                A digraph-prefix is a prefix consisting of the
+                first two hexadecimal digits of a target UUID.
+                For example, the first digraph-prefix of
+                "c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0" is "c0";
+                the second digraph-prefix of that target UUID is
+                "c0ff"; and so forth.
+
+Description of the Scheme---by Way of Example
+
+                Suppose duff is called by with
+                
+                        duff (
+                            path = "~/dbuuid", 
+                            uuid = pase0 ( "c0ffeec0-ffee-" ,
+                                "c0ff-eec0-ffeec0ffeec0" ) )
+
+                Then the duff function will search for a file
+                system object named "c0ffeec0-ffee-c0ff-eec0-
+                ffeec0ffeec0" in the directory "~/dbuuid", then
+                in the subdirectory "~dbuuid/c0" (i.e.,
+                appending the digraph-prefix "c0") then in the
+                subdirectory "~/dbuuid/c0/ff" (i.e., appending
+                the digraph-prefix "ff"), and so forth, until
+                either
+
+                    -   a file named for the target UUID is
+                        found or
+
+                    -   one of the subdirectories attempted to
+                        be searched is found not to exist.
+
+                (The subdirectories that include digraph-
+                prefixes are a kind of hash of the target UUID.)
+
+Storing Files Practical Implementation
+
+                The design of this search pattern allows one to
+                limit the number of subdirectories in a
+                directory (e.g., to accommodate file system
+                limitations).
+                  A corresponding directory structure may be
+                gradually built up in a manner consistent with
+                the scheme and with the names of the files
+                stored. Assuming that a given tree directory may
+                have n subdirectories, n > 256, one may store
+                n - 256 files in the given directory, reserving
+                256 conceptual slots for subdirectories named
+                according to the digraph-prefixes of files
+                stored thereunder (i.e., digraph-prefixes "00"
+                through "ff").  Then, once the need to store the
+                (n - 256 + 1)-th file arises, one may create the
+                subdirectory, and store the file thereunder.
+                  For example, suppose n = 257 and the tree is
+                already storing one file. We might represent
+                such a tree like this:
+
+                        /such a tree
+                        :
+                        +---/bceb53ee-0040-4495-923e-4297f1838695
+                        :
+                        +---[ reserved slots 00 to ff ]
+                        :
+                        :
+                        :
+                        +---[ unused, reserved slot ff ]
+
+                Then another file needs to be stored, say one
+                named "5d23ea60-3bb5-4b9a-9b2e-b00117f78e0d".
+                Since all of the unreserved slots (all one of
+                them) of the tree are already taken, one of the
+                reserved slots is used to create a subdirectory
+                named "5d", and this other file is stored
+                thereunder. We might draw the resultant tree
+                like this:
+
+                        /such a tree
+                        :
+                        +---/bceb53ee-0040-4495-923e-4297f1838695
+                        :
+                        +---[ unused, reserved slots 00 to 5c ]
+                        :
+                        :---/5d
+                        :   :
+                        :   /5d23ea60-3bb5-4b9a-9b2e-b00117f78e0d
+                        :
+                        +---[ unused, reserved slots 5e to ff ]
+
+                However, one of the reasons for creating duff in
+                the first place is as a workaround for the case
+                where files must be stored in a system that
+                imposes a particular kind of hierarchy, but we
+                want to store a file that does not logically fit
+                into a single hierarchy. So, we might draw the
+                resultant tree like this, instead:
+
+                        /such a tree
+                        :
+                        +---/bceb53ee-0040-4495-923e-4297f1838695
+                        :
+                        +---[ unused, reserved slots 00 to 5c ]
+                        :
+                        :---/5d/5d23ea60-3bb5-4b9a-9b2e-b00117f78e0d
+                        :
+                        +---[ unused, reserved slots 5e to ff ]

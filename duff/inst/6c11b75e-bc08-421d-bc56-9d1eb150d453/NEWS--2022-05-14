@@ -1,0 +1,17 @@
+2022-05-14   Neat O   <neatoverse@yahoo.com>
+
+        Version 2022-05-14
+
+        * The DESCRIPTION file for version 2022-05-14 is
+        URN:UUID:05726047-6938-4521-a5ee-cf2c7231b520#DESCRIPTION
+        * Version 2022-05-14 includes the files listed in URN:
+        UUID:dcd4ec7b-8ac7-4099-abd2-b28b28bda9af#collate.csv
+        as well as those listed in URN:UUID:57be6a6b-26a4-499d-
+        96d3-79d8bf5db790\collection.csv
+        * Additional files might be found in the package. Those
+        files may be included in other versions.
+
+        Example Usage
+
+        * See cc197027-87e7-48d4-80b7-6329a68f1c82/example.R
+        for examples of how this package might be used.

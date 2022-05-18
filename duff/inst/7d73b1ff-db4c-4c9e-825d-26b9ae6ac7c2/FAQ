@@ -1,0 +1,40 @@
+FAQ
+
+    Q:
+
+                Why Make this Package?
+
+    A:
+
+                Although it seems to me that many thought he was
+                joking, Joe Armstrong has suggested [AJCSGP]:
+
+                        "We should throw away all names and use
+                        "cryptographic checksums to name things
+                        "and life would be a lot easier.  [There
+                        "is an outburst of laughter from the
+                        "audience.] Well of course it would....
+                        "[more laughter, and more widespread]
+                        "You start naming things...  name a
+                        "file...  what should I call this
+                        file...  what directory should I put it
+                        "in...  what machine should I put it
+                        "in...  stick it all in the same
+                        "directory.  Name it by its SHA and then
+                        "there is no problem."
+
+                  This package is one response to Armstrong's
+                suggestion. The strategy is to create a new UUID
+                for each file to be stored, wrap that file in a
+                directory whose name matches the UUID, and store
+                the corresponding directories in a systematic
+                way.
+                  Reminder: Files stored in this manner might be
+                represented elsewhere by hard links or symbolic
+                links.  Conversely, the files stored by UUID
+                might be themselves symbolic links.
+
+    Reference
+
+                [AJCSGP] See URN:UUID:d4c9368e-d0df-4f5d-bfc3-
+                        de4e8142d71f#REF-AJCSGP.dcf
