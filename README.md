@@ -1,1 +1,1 @@
-# duff-WORM
+[README](https://github.com/dmparrishphd/duff-CORW#readme).
