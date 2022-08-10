@@ -1,0 +1,345 @@
+duff (o2615574722363437501075354070230130144766223/HELP)
+
+Find files named by UUID
+
+Description
+
+                Find files ("ff") by UUID ("ud") [UU], provided
+                that they are stored according to a certain scheme.
+
+Keyword: file
+Keyword: Files
+Keyword: utilities
+Keyword: Utilities
+
+Usage
+
+                # Other usages are possible; the following
+                # illustrates the design:---
+                attach ( name = "protoPkg:duff", what = source (
+                    paste0(pathname, "/duff.R"))[[1]](pathname))
+                # where `pathname` is the pathname of the
+                # directory where duff is installed.
+                duff() # view HELP
+                duff(pathnames, infix)
+
+Arguments
+
+                pathnames
+
+                        A character vector of directory trees to
+                        search. Conceptually similar to .Library.
+
+                infix
+
+                        A character string. The duff function
+                        searches for files whose names contain
+                        this string.
+
+Details
+
+    Definitions
+
+        target
+
+                A target is an infix that may be found in the
+                name of a file that duff is instructed to search
+                for---a character string. One possible infix is:
+
+                        c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0
+
+        tree
+
+                A tree is the pathname of directory---a character
+                string---wherein the duff function is instructed
+                to search for a target.
+
+        digits
+
+                Digits are certain characters that---at least
+                conceptually---map to numerical values. The
+                digits of a canonical UUID are among
+
+                        0 1 2 3 4 5 6 7 8 9 a b c d e f
+
+                The digits of a UUID represented as an octal
+                constant are among
+
+                        0 1 2 3 4 5 6 7
+
+        prefix
+
+                A prefix is the first few characters of the infix.
+
+        digraph-prefix
+
+                A digraph-prefix is a prefix consisting of the
+                first few digits of a target, where first few is
+                even. For example, the first digraph-prefix of
+                "c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0" is "c0";
+                the second digraph-prefix of that target is
+                "c0ff"; and so forth.
+
+Description of the Scheme---by Way of Example
+
+                Suppose duff is called by with
+                
+                        duff (
+                            pathnames = "~/uuid", 
+                            infix = paste0 ( "c0ffeec0-ffee-" ,
+                                "c0ff-eec0-ffeec0ffeec0" ) )
+
+                Then the duff function will search for a file
+                having an infix of "c0ffeec0-ffee-c0ff-eec0-
+                ffeec0ffeec0" in the directory "~/uuid", then
+                in the subdirectory "~dbuuid/c0" (i.e.,
+                appending the digraph-prefix "c0") then in the
+                subdirectory "~/dbuuid/c0/ff" (i.e., appending
+                the digraph-prefix "ff"), and so forth, until
+                either
+
+                    -   a file is found which has the infix
+                        c0ffeec0-ffee-c0ff-eec0-ffeec0ffeec0
+                        or
+
+                    -   one of the subdirectories attempted to
+                        be searched is found not to exist.
+
+                (The subdirectories that include digraph-
+                prefixes are a kind of hash of the target.)
+
+Storing Files Practical Implementation
+
+                The following discussion assumes that targets
+                are octal constants.
+                  The design of this search pattern allows one to
+                limit the number of subdirectories in a directory
+                (e.g., to accommodate file system limitations).
+                  A corresponding directory structure may be
+                gradually built up in a manner consistent with
+                the scheme and with the names of the files
+                stored. Assuming that a given directory may
+                have up to 2 n n (two times en squared)
+                subdirectories, where n is the base of a numeral
+                system, one may store n n subdirectories named
+                for constants in that base (for octal, 64
+                subdirectories), reserving n n conceptual slots
+                for subdirectories named according to the
+                digraph-prefixes of subdirectories stored
+                thereunder (i.e., digraph-prefixes "00" through
+                "77" for octal numbers).  Then, once the need to
+                store the n n + 1-th subdirectory arises, one may
+                create it and store it thereunder. For example,
+                suppose an octal system and that a tree is
+                already storing 64 files . We might represent
+                such a tree like this:
+
+                        /someTree
+                        :
+                        +---/<first subdirectory>
+                        :
+                        +---/<second directory>
+                        :
+                        :
+                        :
+                        +---/<64th directory>
+                        :
+                        +---[ reserved slots 00 to 76 ]
+                        :
+                        :
+                        +---[ reserved slot 77 ]
+
+                Then another subdirectory needs to be stored,
+                say one named
+                "o1401633172621463105777211371341752604320053".
+                Since all of the unreserved slots are already
+                taken, one of the reserved slots is used to
+                create a subdirectory named "14", and the
+                "o1401633172621463105777211371341752604320053"
+                subdirectory is stored thereunder. We might draw
+                the resultant tree like this:
+
+                        /someTree
+                        :
+                        +---/<first subdirectory>
+                        :
+                        +---/<second directory>
+                        :
+                        :
+                        :
+                        +---/<64th directory>
+                        :
+                        +---[ reserved slots 00 to 13 ]
+                        :
+                        +---/14
+                        :   :
+                        +   /o1401633172621463105777211371341752604320053
+                        :
+                        +---[ reserved slots 15 to 77 ]
+
+                However, one of the reasons for creating duff in
+                the first place is as a workaround for the case
+                where files must be stored in a system that
+                imposes a particular kind of hierarchy, but we
+                want to store a file that does not logically fit
+                into a single hierarchy. So, we might draw the
+                resultant tree like this, instead:
+
+                        /someTree
+                        :
+                        +---/<first subdirectory>
+                        :
+                        +---/<second directory>
+                        :
+                        :
+                        :
+                        +---/<64th directory>
+                        :
+                        +---[ reserved slots 00 to 13 ]
+                        :
+                        +---/14/o1401633172621463105777211371341752604320053
+                        :
+                        +---[ reserved slots 15 to 77 ]
+
+Background
+
+                Although it seems to me that many thought he was
+                joking, Joe Armstrong has suggested [AJ]:
+
+                        "We should throw away all names and use
+                        "cryptographic checksums to name things
+                        "and life would be a lot easier.  [There
+                        "is an outburst of laughter from the
+                        "audience.] Well of course it would....
+                        "[more laughter, and more widespread]
+                        "You start naming things...  name a
+                        "file...  what should I call this
+                        file...  what directory should I put it
+                        "in...  what machine should I put it
+                        "in...  stick it all in the same
+                        "directory.  Name it by its SHA and then
+                        "there is no problem."
+
+                  This package is one response to Armstrong's
+                suggestion. The strategy is to create a new UUID
+                for each file to be stored, wrap that file in a
+                directory whose name matches the UUID, and store
+                the corresponding directories in a systematic
+                way.
+                  Reminder: Files stored in this manner might be
+                represented elsewhere by hard links or symbolic
+                links.  Conversely, the files stored by UUID
+                might be themselves symbolic links.
+
+References
+
+                [AJ] Armstrong J (2018-04-25) Computer
+                Science---A Guide for the Perplexed GOTO 2018;
+                Chicago. <https://gotochgo.com/2018/sessions/360>
+
+                [UU] https://en.m.wikipedia.org/wiki/Universally_
+                unique_identifier
+
+Identification
+
+                This file is identified as
+                o2615574722363437501075354070230130144766223/HELP
+
+Examples
+
+                # IN ORDER FOR THESE EXAMPLES TO WORK, duff MUST
+                # BE INSTALLED AT
+                # "~/var/tmp/o2615574722363437501075354070230130144766223"
+                # FURTHERMORE, THE DIRECTORY "~/var/tmp/duffExample"
+                # MUST EXIST AND MUST BE WRITABLE. YOU WILL NEED
+                # TO CREATE THE "~/var/tmp/duffExample"
+                # DIRECTORY IF IT DOES NOT YET EXIST.
+
+                pathname <- paste0("~/var/tmp",
+                "/o2615574722363437501075354070230130144766223")
+
+                # PUT duff ON THE SEARCH PATH:---
+                attach(
+                    name = "protoPkg:duff",
+                    what = source(paste0(
+                        pathname, "/duff.R"))[[1]](pathname))
+
+                # VIEW HELP
+                duff()
+
+                # CREATE SOME DIRECTORIES THAT MAY BE FOUND BY duff
+                dir.create("~/var/tmp/duffExample/uuid")
+                dir.create("~/var/tmp/duffExample/ouuid")
+                dir.create(paste0(
+                    "~/var/tmp/duffExample/uuid",
+                    "/f7fb2632-9fa2-4042-9cd6-1e564005468a"))
+                dir.create(paste0(
+                    "~/var/tmp/duffExample/ouuid",
+                    "/o3677662306247721100205163260745310001243212"))
+                dir.create(recursive = TRUE, paste0(
+                    "~/var/tmp/duffExample/ouuid/05/35/41",
+                    "0535416245614022511507344531434312043553351"))
+
+                # SEARCH FOR f7fb2632-9fa2-4042-9cd6-1e564005468a
+                duff(
+                    pathnames = paste0 (
+                        "~/var/tmp/duffExample" ,
+                        c ( "/ouuid" , "/uuid" ) ) ,
+                    infix = "f7fb2632-9fa2-4042-9cd6-1e564005468a")
+
+                # SEARCH FOR 3677662306247721100205163260745310001243212
+                duff(
+                    pathnames = paste0 (
+                        "~/var/tmp/duffExample" ,
+                        c ( "/ouuid" , "/uuid" ) ) ,
+                    infix = "3677662306247721100205163260745310001243212")
+
+                # SEARCH FOR 0535416245614022511507344531434312043553351
+                duff(
+                    verbose = TRUE ,
+                    pathnames = paste0 (
+                        "~/var/tmp/duffExample" ,
+                        c ( "/ouuid" , "/uuid" ) ) ,
+                    infix = "0535416245614022511507344531434312043553351")
+
+                # REMOVE duff FROM THE SEARCH PATH
+                detach("protoPkg:duff")
+
+                # SOURCE, USE, AND DISPOSE OF duff IMMEDIATELY
+                # AFTER USE.
+                AndWhat.FoundThere <- source(paste0(
+                    pathname, "/duff.R"))[[1]](pathname)$duff(
+                        pathnames = paste0 (
+                            "~/var/tmp/duffExample" ,
+                            c ( "/ouuid" , "/uuid" ) ) ,
+                        infix = "0535416245614022511507344531434312043553351")
+                cat(AndWhat.FoundThere, sep="\n")
+
+                # USE FROM ENVIRONMENT:
+                e <- source(paste0(
+                    pathname, "/duff.R"))[[1]](pathname)
+                e$duff(
+                    pathnames = paste0 (
+                        "~/var/tmp/duffExample" ,
+                        c ( "/ouuid" , "/uuid" ) ) ,
+                    infix = "0535416245614022511507344531434312043553351")
+
+                # EXAMINE PART OF THE PACKAGE STRUCTURE
+                e |> ls()
+                e$duff |> environment() |> ls()
+                e$duff |> environment() |> parent.env() |> ls()
+
+                # SEARCH FOR MULTIPLE FILES
+                WANTED = c (
+                    "f7fb2632-9fa2-4042-9cd6-1e564005468a",
+                    "SHOULD-NOT-EXIST" ,
+                    "0535416245614022511507344531434312043553351" )
+                PATHNAMES <- paste0 (
+                    "~/var/tmp/duffExample" ,
+                    c ( "/ouuid" , "/uuid" ) )
+                data.frame (
+                    WANTED = WANTED ,
+                    FOUND = matrix ( lapply (
+                        X = WANTED ,
+                        FUN = function ( infix )
+                                e$duff ( PATHNAMES , infix ) ) ) )

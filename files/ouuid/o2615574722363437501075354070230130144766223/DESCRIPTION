@@ -1,0 +1,12 @@
+Package: o2615574722363437501075354070230130144766223
+Type: Package
+Title: Find files named by UUID
+Version: 2022.08-10
+Date: 2022-08-10
+Author: D. Michael Parrish [aut]
+Maintainer: Neat O <neatoverse@yahoo.com>
+Encoding: UTF-8
+Description: Defines a function, "duff" that finds files ("ff")
+    by UUID ("ud") provided that they are stored according to a
+    certain, simple scheme.
+License: AGPL-3
